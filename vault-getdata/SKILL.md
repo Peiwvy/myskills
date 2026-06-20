@@ -4,6 +4,17 @@ description: 拉取关注标的的当前价格，写入 Obsidian frontmatter。�
 user_invocable: true
 ---
 
+## 上游依赖
+
+本 skill 行为受以下 Z98 规范约束：
+
+- [[schema_entity_micro]] — frontmatter `价格` `状态` 字段定义
+- [[结构设计]] — `状态` 字段枚举值
+
+> 完整依赖图见 [[依赖地图.html]]。
+
+---
+
 ## 执行步骤
 
 当用户调用此 skill 时，立即执行以下命令，无需确认：

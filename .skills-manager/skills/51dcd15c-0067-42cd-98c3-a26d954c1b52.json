@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "51dcd15c-0067-42cd-98c3-a26d954c1b52",
+  "path": "vault-pre-distill",
+  "path_key": "vault-pre-distill",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}

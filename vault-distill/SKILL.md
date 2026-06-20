@@ -1,15 +1,35 @@
 ---
 name: vault-distill
-description: 将**单个**素材文件（来自 10-Source/）萃取路由到**已有结构**（F30-F34 投资知识库 / G30 通用主题）。当用户说「萃取」、「处理这篇」、「读这篇笔记」、「整理这个文件」、「distill」、「这条素材怎么放」、「拆原子」、「写进 vault」时触发。流程：判断输入形态 → 路由到 entity / narrative / framework / concept → 写入页面。**边界**：单文件 → 已有结构；遇结构问题 → escalate 到 vault-system-design。
+description: 将**单个**素材文件（来自 K10-Source/）萃取路由到**已有结构**（KF32-Meso / KF33-Micro / KG30-Topics）。当用户说「萃取」、「处理这篇」、「读这篇笔记」、「整理这个文件」、「distill」、「这条素材怎么放」、「拆原子」、「写进 vault」时触发。**边界**：单文件 → 已有结构；遇结构问题 → escalate 到 vault-system-design。**宏观素材不在此 skill 处理**——有对应 Pivot 则合并更新，无则跳过。
+date modified: 2026-06-17
+---
+
+## 上游依赖
+
+- [[结构设计#流转主链]] — 路由判据（K10→Inbox→KF/KG 走向）
+- [[schema_common]] — 三段骨架
+- [[schema_pivot]] — Pivot 页面 schema
+- [[schema_structure]] — Structure 页面 schema
+- [[schema_archives]] — Archives 页面 schema
+- [[schema_entity_meso]] — Meso Entity 写入格式
+- [[schema_entity_micro]] — Micro Entity 写入格式
+- [[schema_entity_person]] — Person Entity 写入格式
+- [[schema_entity_concept]] — Concept Entity 写入格式
+- [[schema_framework]] — Framework 写入格式
+- [[schema_source]] — 输入格式定义
+
+> 完整依赖图见 [[依赖地图.html]]。
+
 ---
 
 ## 知识萃取（Distill）
 
 **萃取 = 操作要素的一种形态**：在已有结构下，把单篇素材转化为知识要素。
 
-**核心原则：拆原子，归属主体。** 不按来源组织提取结果（那是归档），而是把每条有价值的信息拆到最小单元，归属到它描述的主体页面。源文件变成"收据"，知识的主存储在主体页面。
+**核心原则：拆原子，归属主体。** 不按来源组织提取结果（那是归档），而是把每条有价值的信息拆到最小单元，归属到它描述的主体页面。
 
-将素材池（`10-Source/`）的原始材料路由到 **F 知识库**（F30-F34）或 **G 域**（非投资）。架构规则以 [[节点关系#流转主链]] 为权威，本 skill 的路由段是可执行简版，遇到分歧以 [[节点关系]] 为准。
+> [!important] 本 skill 范围
+> distill 处理**中观、微观、G 域**。宏观素材的处理见 [[KF31-Macro/CLAUDE.md#EM 工作流：积累 → 沉淀]]——日常只在有对应 Pivot 时合并更新，否则跳过等每周沉淀。
 
 ### 触发方式
 
@@ -43,89 +63,85 @@ distill 处理「**单文件 → 已有结构**」。发现以下任一信号，
 | 同类待路由文件 ≥3 且需 MECE 分桶 / 子目录"放不下" | `relate.md` §拆分 |
 | 大规模断链 / 孤立页堆积 / 反复"找不到" | `relate.md` 或回 `vault-system-design` 诊断 |
 
-**建页边界**：单个新 entity/narrative 页面（适用现有 schema）属 distill 范围，可直接建。需共建多个同层级新 entity 或当前 schema 不适用 → 切 vault-system-design。
-
-未触发以上信号 → 继续 Step 2。
+**建页边界**：单个新 entity 页面（适用现有 schema）属 distill 范围，可直接建。需共建多个同层级新 entity 或当前 schema 不适用 → 切 vault-system-design。
 
 ### Step 2：内容路由
 
-对每个内容单元，自顶向下问：
-
 ```
-├── 怎么做？（方法论）         → F34-Framework/
-├── 是什么？（定义/机制）      → F30-Concept/
-├── 当前结论 + 单实体能讲清   → Entity（F31-Macro / F32-Meso / F33-Micro）
-├── 当前结论 + 跨实体         → Narrative（见 [[narrative-routing|Narrative 路由手册]]）
-└── 非投资内容                → G30-Topics/
+素材进入
+├── 非 F 域？                         → KG30-Topics/
+└── F 域投资内容：
+      ├── 宏观？（地缘/政策/货币/利率/全球传导）
+      │     → 看因果图，有对应 Pivot？→ 更新 Pivot 时间线/判断
+      │     → 没有对应 Pivot？→ 跳过，告知用户"无对应 Pivot，已跳过"
+      └── 中观微观？（行业/赛道/公司/产品）
+            ├── 行业/赛道               → KF32 Meso Entity
+            └── 公司/产品               → KF33 Micro Entity
 ```
 
-**Entity vs Narrative**："单个 Entity 页面能讲清楚吗？"——能→走 Entity；不能（跨实体传导链/多方博弈）→走 Narrative。Narrative 路由细则见 [[narrative-routing]]。
+#### 宏观素材处理
 
-**F30-Concept vs Entity**：F30 装"定义型"知识（"什么是 CTA 策略"——无时效判断，回答"是什么"）；Entity 装"当前结论"（带时效的事实、判断、行动）。
+**不建新页，不做即时 distill。** 流程：
 
-**Entity 内抽象层次**（替换测试）：把这段话从 entity A 搬到同类 entity B 页是否仍成立？成立→属更高抽象层（应提升到行业/市场 entity）。详见 [[schema_common#实体纯粹性 与 跨页依据]]。
+1. 读素材 → 看 Excalidraw 因果图
+2. 图上有对应 Pivot 节点？→ 更新该 Pivot 的时间线/当前判断
+3. 图上没有？→ 不做任何写入，告知用户"素材 X 当前无对应 Pivot，已跳过"
+4. Pivot 的新建/合并/拆分 → 留给每周沉淀（vault-converge）
+
+#### 中观/微观 distill
+
+**中观微观：只有 Entity。** 行业、公司、产品不涉及宏观因果网络。拆原子 → 路由 entity 截面/时间线/机理。
+
+**Entity 内抽象层次**（替换测试）：把这段话从 entity A 搬到同类 entity B 页是否仍成立？成立→属更高抽象层（应提升到行业/市场 entity）。
 
 ### Step 3：写入目标页面
 
-**按对应 schema 执行**（写入格式、时间线格式、推断标记等详见 [[schema_common]] 及各子 schema）：
-- [[schema_entity_macro]] · [[schema_entity_meso]] · [[schema_entity_micro]]
-- [[schema_entity_person]] · [[schema_entity_concept]]
-- [[schema_narrative]] · [[schema_framework]]
+**Entity 写入规则（meso/micro）**：
+- [[schema_entity_meso]] · [[schema_entity_micro]]
+- Entity 只做：**截面** + **机理** + **时间线** + **连接层**
+- 不做判断、不推演——方向判断归 Pivot
+
+**Structure 更新规则（宏观，当有对应 Pivot 时）**：
+- [[schema_structure]] — **截面 + 机理 + 状态指标**
+- 仅当素材含新的状态指标数据时更新
+
+**Pivot 更新规则（宏观，当有对应 Pivot 时）**：
+- [[schema_pivot]] — 追加时间线条目 + 必要时更新当前判断
+- 不建新 Pivot，不修改 upstream/downstream
+
+**其他类型**：
+- [[schema_entity_person]] · [[schema_entity_concept]] · [[schema_framework]]
 
 **写入前必做**：
 
-1. **查重**：grep 目标页面搜索日期 + 关键人名/机构名。已涵盖且无新内容→不写；有补充→扩展已有条目；未命中→新增；同日不同主体→并列条目
-2. **截面 vs 时间线**：新证据改变了对实体"是什么/怎么运作"的理解→更新截面（含一句话主线）；新证据在现有框架内只是新数据点→时间线条目
-3. **交叉验证**：新源验证已有截面→注明；补充空白→更新；事实矛盾→标 ⚡ 分歧保留双方；结构逻辑矛盾→保留两条推断链
-4. **主线演化 Log**：判断翻转/本质重写→追加 Log；仅细节修正/数据更新→仅覆盖主线不追加。完整规则见 [[schema_common#主线演化（页底 Log）]]
+1. **查重**：grep 目标页面搜索日期 + 关键人名/机构名
+2. **截面 vs 时间线**：新证据改变结构性理解→更新截面；只是新数据点→时间线条目
+3. **交叉验证**：新源验证已有截面→注明；补充空白→更新；事实矛盾→标 ⚡ 分歧保留
+4. **主线演化 Log**：判断翻转/本质重写→追加 Log；仅细节修正→仅覆盖主线
 
 **硬规则**（SSOT 在 [[schema_common]]，违反即错误）：
 
-- **保留旧内容**：frontmatter 属性全部保留，新数据就地融入已有截面对应段落
-- **可验证性**：有源、缺源即空、禁模糊主语、不用素材池双链（详见 [[schema_common#事实层]] §可验证性）
-- **实体纯粹性**：水平（跨实体驱动用双链不在本页复述）+ 垂直（替换测试是判据）
-- **解读列依据**：每条主逻辑/分歧/机理末尾必列依据（详见 [[schema_common#解读层模板]]）
-- **前瞻三件套**：基于 + 验证窗口 + 证伪信号缺一不可（详见 [[schema_common#前瞻层条目格式]]）
-- **结构性推断 🔗 优先识别**：这是 vault 最高价值内容，写入解读层「待验证机理」或前瞻层
-
-**目录特定规则**：见各目录 CLAUDE.md
+- **保留旧内容**：frontmatter 属性全部保留
+- **可验证性**：有源、缺源即空、禁模糊主语
+- **实体纯粹性**：水平（跨实体驱动用双链）+ 垂直（替换测试）
+- **解读列依据**：每条主逻辑必列依据
+- **结构性推断 🔗 优先识别**
 
 ### Step 4：二次校验 + 完成
 
-**A. Traceability**：逐条检查硬规则是否全过。常见违反修复：无源→补来源或 `[待补]`；模糊主语→具名或删除；素材池双链→替换为文字来源；解读无依据/前瞻缺三件套→补字段或删除。
-
-**B. 内容完整性**：原文每个有密度的信息点都有去处？查重无遗漏？跨多方深远影响事件是否误判为时间线（应抽出为 closed narrative）？
-
-**C. 格式**：时间线条目符合 [[schema_common#时间线条目格式]]；同一事件多处出现时用主从归属模式（主归详写 + 从归摘要+锚链接）。
+**A. Traceability**：硬规则全过。**B. 内容完整性**：每个信息点都有去处。**C. 格式**：时间线条目符合 [[schema_common#时间线条目格式]]。
 
 **完成处理**：
-
-- 原文 frontmatter tags 加入 `state/source/distilled`
-- 告知用户：路由了哪些内容单元 → 分别去了哪里
+- 原文 frontmatter 加入 `state/source/distilled`
+- 告知用户：路由了哪些内容单元 → 去了哪里
 
 ---
 
 ## 边界情况
 
-### 拆分价值门槛
-
-拆出的单元需同时满足：**可独立**（脱离原文仍能理解）、**可复用**（未来可能被引用）、**有密度**（含客观结论或结构性矛盾）。不满足的留在 narrative 或素材池，不强行拆出。
-
-### 分类不明暂停
-
-以下情况**不强行归类，停下来问用户**：现有分类树找不到明确归属；跨多个分类无法判断主归属；拟归入已有页面但不确定截面还是时间线。
-
-### Legacy 处理
-
-- **原 `schema_event` / `schema_tracking` 已废除**：统一按 [[schema_narrative]] + 状态字段写入
-- **Legacy `Event/` 目录**：部分 CTY/REG 下的 `Event/` 为旧物理遗留，新材料不进入
-
----
+- 宏观素材无对应 Pivot → 跳过，不等同于"有结构问题"，不切 vault-system-design
+- 分类不明 → 停，问用户
 
 ## 核心设计原则
 
-**拆原子，归属主体**：不按来源组织（那是归档），按主体组织——同一主体的信息自动聚合、新旧碰撞、跨主体关联浮现。
-
-**结构性推断优先识别** → [[schema_common#结构性推断标记 🔗]]
-
-**竞争而非替换、可追溯性高于完整性** → [[schema_common#事实层]] §可验证性 + §缺源即空跨段落适用
+**拆原子，归属主体**。**结构性推断优先识别**。**竞争而非替换、可追溯性高于完整性**。

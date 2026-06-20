@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "83ff9af0-a7bf-4b8e-bb29-ddc4e91d03a5",
+  "path": "tradingview-interact",
+  "path_key": "tradingview-interact",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}

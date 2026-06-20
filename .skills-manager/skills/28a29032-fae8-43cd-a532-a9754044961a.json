@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "28a29032-fae8-43cd-a532-a9754044961a",
+  "path": "vault-project",
+  "path_key": "vault-project",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}

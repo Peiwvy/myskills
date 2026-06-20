@@ -1,13 +1,24 @@
 ---
 name: vault-narrative-writing
-description: 编写和重写 Obsidian 知识库中 F31-Macro 目录下的 Narrative（叙事型）页面。当用户要求"补充"/"补全"/"重写"/"整理" F31-Macro/*/Narrative/ 下的文件时使用。Entity 页面（概念/定义/稳定结构，无时间维度）不适用。
+description: 编写和重写 Obsidian 知识库中 KF31-Macro 目录下的 Narrative（叙事型）页面。当用户要求"补充"/"补全"/"重写"/"整理" KF31-Macro/*/NarrativeActive|NarrativeClosed/ 下的文件时使用。Entity 页面（概念/定义/稳定结构，无时间维度）不适用。
+---
+
+## 上游依赖
+
+本 skill 行为受以下 Z98 规范约束：
+
+- [[schema_narrative]] — 六段模板 + 生命周期字段
+- [[schema_common]] — 一句话主线格式
+
+> 完整依赖图见 [[依赖地图.html]]。
+
 ---
 
 # Narrative 写作方法
 
 ## 概述
 
-编写 F31-Macro/*/Narrative/ 目录下的叙事页面。每个 narrative 讲一个历史事件的故事——它的背景、经过和留下的影响。
+编写 KF31-Macro/*/NarrativeActive|NarrativeClosed/ 目录下的叙事页面。每个 narrative 讲一个历史事件的故事——它的背景、经过和留下的影响。
 
 核心原则：**每篇 narrative 应该是一条因果链，而不是一个事实列表。**
 

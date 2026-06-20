@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "c031a52f-0809-4768-bf09-c1b7f49a7776",
+  "path": "opencli-bridge",
+  "path_key": "opencli-bridge",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "skill_id": "b7fc7bda-35b1-4736-bb95-ced848744673",
+  "path": "bilibili-to-vault",
+  "path_key": "bilibili-to-vault",
+  "enabled": true,
+  "tags": [],
+  "source": {
+    "type": "local",
+    "ref": null,
+    "subpath": null,
+    "branch": null
+  }
+}

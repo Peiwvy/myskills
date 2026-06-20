@@ -1,6 +1,6 @@
 # Micro Entity 输出格式
 
-本文档定义"公司分析"skill 写入 F33-Micro 公司页面时的输出格式。
+本文档定义"公司分析"skill 写入 KF33-Micro 公司页面时的输出格式。
 
 ## 目标页面 Schema
 
