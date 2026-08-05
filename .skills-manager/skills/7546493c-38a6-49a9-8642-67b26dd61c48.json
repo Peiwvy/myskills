@@ -4,9 +4,7 @@
   "path": "mckinsey-report",
   "path_key": "mckinsey-report",
   "enabled": true,
-  "tags": [
-    "creative"
-  ],
+  "tags": [],
   "source": {
     "type": "local",
     "ref": null,

@@ -6,9 +6,16 @@
   "tools": {
     "claude_code": false,
     "codebuddy": true,
+    "codex": true,
+    "command_code": true,
     "cursor": true,
+    "droid": true,
+    "grok": true,
     "hermes": false,
+    "omp_agent": true,
     "opencode": true,
-    "qoder": true
+    "pi": true,
+    "qoder": true,
+    "workbuddy": true
   }
 }
